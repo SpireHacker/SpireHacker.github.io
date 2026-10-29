@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06060c">
+<title>Spire — Minecraft 1.8.9 客户端</title>
+<meta name="description" content="Spire 是一个 Minecraft 1.8.9 的 Forge 客户端模组。ClickGUI、HUD、灵动岛、音乐播放器和脚本引擎都在一个 jar 里。">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+
+<div class="scroll-progress" aria-hidden="true"><i id="scrollBar"></i></div>
+
+<!-- ===== 背景层 ===== -->
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<!-- ===== 导航 ===== -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Spire">
+      <span class="brand-mark">
+        <img src="assets/logo.png" alt="Spire" width="22" height="22">
+      </span>
+      <span class="brand-text">SPIRE</span>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#features" data-en="Features">特性</a>
+      <a href="#modules" data-en="Modules">模块</a>
+      <a href="#download" data-en="Download">下载</a>
+      <a href="#faq" data-en="FAQ">常见问题</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="lang-btn" id="langBtn" aria-label="Switch language">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg>
+        <span id="langLabel">EN</span>
+      </button>
+      <a class="btn btn-primary btn-sm" href="downloads/Spire.jar" download>
+        <span data-en="Download">下载</span>
+      </a>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" data-en="Features">特性</a>
+  <a href="#modules" data-en="Modules">模块</a>
+  <a href="#download" data-en="Download">下载</a>
+  <a href="#faq" data-en="FAQ">常见问题</a>
+</div>
+
+<main id="top">
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-halo" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="badge reveal">
+        <span class="dot"></span>
+        <span data-en="v2.5 RF · Minecraft 1.8.9 · Forge">v2.5 RF · Minecraft 1.8.9 · Forge</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="grad">SPIRE</span>
+      </h1>
+
+      <p class="hero-sub reveal" data-delay="2" data-en="Minecraft 1.8.9 · Forge · Client-side">
+        Minecraft 1.8.9 · Forge · 纯客户端
+      </p>
+
+      <p class="hero-desc reveal" data-delay="3" data-en="The GUI, the HUD, the music player and the script engine all live in one jar. Drop it in mods.">
+        界面、HUD、音乐播放器、脚本引擎都在一个 jar 里，丢进 mods 就能用。
+      </p>
+
+      <div class="hero-actions reveal" data-delay="4">
+        <a class="btn btn-primary btn-lg" href="downloads/Spire.jar" download>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16"/></svg>
+          <span data-en="Download for 1.8.9">下载 1.8.9 版本</span>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#modules">
+          <span data-en="See the modules">看看模块</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="hero-meta reveal" data-delay="5">
+        <div><b>80<small>+</small></b><span data-en="Modules">功能模块</span></div>
+        <i></i>
+        <div><b>900<small>+</small></b><span data-en="Settings">可调选项</span></div>
+        <i></i>
+        <div><b>1<small>jar</small></b><span data-en="Single file">一个文件</span></div>
+      </div>
+    </div>
+
+    <!-- ClickGUI 预览 —— 按 ui/ClickGui.java 一比一还原
+         栏宽 92 / 标题高 13 / 行高 16 / 圆角 10 / 竖排 x=5 y+=20
+         主题色 #4FC3F7 / 启用色 #189AFF / 中央竖排 s p i r e + RF + 两条白竖线 -->
+    <div class="showcase reveal" data-delay="6" id="showcase">
+      <div class="showcase-glow" aria-hidden="true"></div>
+      <div class="viewport" id="gui">
+        <div class="scene" aria-hidden="true">
+          <span class="sc-sky"></span>
+          <span class="sc-sun"></span>
+          <span class="sc-hill h1"></span>
+          <span class="sc-hill h2"></span>
+          <span class="sc-ground"></span>
+        </div>
+        <div class="scene-dim" aria-hidden="true"></div>
+
+        <!-- 屏幕中央：竖排 s p i r e / RF + 两条白竖线 -->
+        <div class="cg-logo" aria-hidden="true">
+          <i class="cg-rule rl"></i>
+          <i class="cg-rule rr"></i>
+          <span class="gl g1">s</span>
+          <span class="gl g2">p</span>
+          <span class="gl g3">i</span>
+          <span class="gl g4">r</span>
+          <span class="gl g5">e</span>
+          <span class="gl g6">RF</span>
+        </div>
+
+        <!-- 左列：8 个分类栏（点标题展开 / 收起，跟客户端一样用 500ms easeInOutCubic 撑高） -->
+        <div class="cg-col">
+          <div class="cg-frame" style="--i:0;--rows:8">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/combat.png" alt="" aria-hidden="true">
+              <span>Combat</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>KillAura</span></div>
+              <div class="cg-e on"><span>Velocity</span></div>
+              <div class="cg-e"><span>Reach</span></div>
+              <div class="cg-e"><span>BackTrack</span></div>
+              <div class="cg-e on"><span>AutoClicker</span></div>
+              <div class="cg-e on"><span>SmartAttack</span></div>
+              <div class="cg-e"><span>TargetStrafe</span></div>
+              <div class="cg-e"><span>HitBox</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:1;--rows:8">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/movement.png" alt="" aria-hidden="true">
+              <span>Movement</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e"><span>Fly</span></div>
+              <div class="cg-e on"><span>Speed</span></div>
+              <div class="cg-e on"><span>NoSlow</span></div>
+              <div class="cg-e"><span>LongJump</span></div>
+              <div class="cg-e"><span>Blink</span></div>
+              <div class="cg-e on"><span>AntiVoid</span></div>
+              <div class="cg-e on"><span>Sprint</span></div>
+              <div class="cg-e"><span>SafeWalk</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:2;--rows:8">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/player.png" alt="" aria-hidden="true">
+              <span>Player</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>Scaffold</span></div>
+              <div class="cg-e on"><span>InvManager</span></div>
+              <div class="cg-e"><span>ChestStealer</span></div>
+              <div class="cg-e on"><span>AutoTool</span></div>
+              <div class="cg-e on"><span>FastPlace</span></div>
+              <div class="cg-e"><span>GhostHand</span></div>
+              <div class="cg-e on"><span>AutoHeal</span></div>
+              <div class="cg-e"><span>SpeedMine</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:3;--rows:8">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/misc.png" alt="" aria-hidden="true">
+              <span>Misc</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e"><span>Spammer</span></div>
+              <div class="cg-e on"><span>NickHider</span></div>
+              <div class="cg-e"><span>Disabler</span></div>
+              <div class="cg-e on"><span>NoRotate</span></div>
+              <div class="cg-e on"><span>AntiObbyTrap</span></div>
+              <div class="cg-e"><span>BedNuker</span></div>
+              <div class="cg-e on"><span>RenderFixes</span></div>
+              <div class="cg-e"><span>AntiObfuscate</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:4;--rows:1">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/music.png" alt="" aria-hidden="true">
+              <span>Music</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>MusicPlayer</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:5;--rows:4">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/script.png" alt="" aria-hidden="true">
+              <span>Script</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>AutoPot.js</span></div>
+              <div class="cg-e"><span>SprintReset.js</span></div>
+              <div class="cg-e on"><span>BedAura.js</span></div>
+              <div class="cg-e"><span>NoSlow.js</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:6;--rows:4">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/store.png" alt="" aria-hidden="true">
+              <span>Script Store</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>AutoPot</span></div>
+              <div class="cg-e on"><span>SprintReset</span></div>
+              <div class="cg-e"><span>BedAura</span></div>
+              <div class="cg-e on"><span>NoSlow</span></div>
+            </div></div>
+          </div>
+
+          <div class="cg-frame" style="--i:7;--rows:3">
+            <div class="cg-head">
+              <img class="cg-ico" src="assets/items/profiles.png" alt="" aria-hidden="true">
+              <span>Profiles</span>
+            </div>
+            <div class="cg-body"><div class="cg-list">
+              <div class="cg-e on"><span>default</span></div>
+              <div class="cg-e"><span>pvp</span></div>
+              <div class="cg-e"><span>vanilla</span></div>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- 右侧：被拖出来并展开的 Render 栏 -->
+        <div class="cg-frame cg-open opened" style="--rows:11">
+          <div class="cg-head">
+            <img class="cg-ico" src="assets/items/render.png" alt="" aria-hidden="true">
+            <span>Render</span>
+          </div>
+          <div class="cg-body"><div class="cg-list">
+            <div class="cg-e on"><span>ESP</span></div>
+            <div class="cg-e on"><span>HUD</span></div>
+            <div class="cg-e on"><span>DynamicIsland</span></div>
+            <div class="cg-e"><span>Tracers</span></div>
+            <div class="cg-e on"><span>NameTags</span></div>
+            <div class="cg-e"><span>TargetHUD</span></div>
+            <div class="cg-e"><span>Chams</span></div>
+            <div class="cg-e"><span>Xray</span></div>
+            <div class="cg-e"><span>FullBright</span></div>
+            <div class="cg-e"><span>Indicators</span></div>
+            <div class="cg-e"><span>Trajectories</span></div>
+          </div></div>
+        </div>
+
+        <!-- 顶部居中：灵动岛（240×26 idle / 260×46 active，圆角 = h/2，黑 60%，描边 55% 主题色） -->
+        <div class="cg-island">
+          <div class="is-row">
+            <i class="is-dot"></i>
+            <span class="is-name">Spire</span>
+            <i class="is-sep"></i>
+            <span class="is-fps">240</span>
+            <i class="is-sep"></i>
+            <span class="is-ver">v2.5</span>
+          </div>
+          <div class="is-bar"><i></i></div>
+          <div class="is-music">
+            <div class="is-eq"><i></i><i></i><i></i></div>
+            <span class="is-song">unhappy</span>
+          </div>
+          <div class="is-lyric">Will you even love me anymore</div>
+        </div>
+
+        <!-- 左下角：客户端名 + 版本 + 逐字动画的开发者 -->
+        <div class="cg-foot" aria-hidden="true">
+          <div class="cg-ver">Spire-v2.5-RF</div>
+          <div class="cg-dev" id="cgDev">dev, spireRF</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 跑马灯 ===== -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>KILLAURA</span><em>◆</em><span>SCAFFOLD</span><em>◆</em><span>DYNAMIC ISLAND</span><em>◆</em>
+      <span>SCRIPT ENGINE</span><em>◆</em><span>MUSIC PLAYER</span><em>◆</em><span>ALT MANAGER</span><em>◆</em>
+      <span>KILLAURA</span><em>◆</em><span>SCAFFOLD</span><em>◆</em><span>DYNAMIC ISLAND</span><em>◆</em>
+      <span>SCRIPT ENGINE</span><em>◆</em><span>MUSIC PLAYER</span><em>◆</em><span>ALT MANAGER</span><em>◆</em>
+    </div>
+  </div>
+
+  <!-- ===== 特性 ===== -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow" data-en="How it works">实现细节</span>
+        <h2 data-en-html="Six things the code <em>actually does</em>">代码里<em>实际做的六件事</em></h2>
+        <p data-en="No feature-list padding. These are the parts you notice after using it for a week.">
+          不是功能罗列。下面这些是用了几天之后才会注意到的部分。
+        </p>
+      </div>
+
+      <div class="grid grid-3">
+        <article class="card reveal" data-delay="1">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg>
+          </div>
+          <h3 data-en="Input isn't queued">输入不排队</h3>
+          <p data-en="A key press is dispatched on the tick it is read. No queue in between, no delay compensation.">
+            读到按键的那一 tick 就派发出去，中间不加队列，也不做延迟补偿。
+          </p>
+          <span class="card-line"></span>
+        </article>
+
+        <article class="card reveal" data-delay="2">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M12 7v5l3.5 2"/></svg>
+          </div>
+          <h3 data-en="Animation runs on real time">动画按真实时间走</h3>
+          <p data-en="Hover, toggles and transitions advance on wall-clock time — 120ms, smoothstep. A dropped frame skips the render, not the progress.">
+            悬停、开关、过渡都用真实时间推进，120ms，smoothstep 缓动。掉帧只少画一帧，进度照走。
+          </p>
+          <span class="card-line"></span>
+        </article>
+
+        <article class="card reveal" data-delay="3">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 17V7l8-4 8 4v10l-8 4z"/><path d="M4 7l8 4 8-4M12 11v10"/></svg>
+          </div>
+          <h3 data-en="One colour, everywhere">改一个色，全跟着变</h3>
+          <p data-en="The ClickGUI, HUD, dynamic island and vanilla screens share one accent colour. You change it once, in the GUI.">
+            ClickGUI、HUD、灵动岛、原版界面共用同一个强调色。在 GUI 里改一次就够。
+          </p>
+          <span class="card-line"></span>
+        </article>
+
+        <article class="card reveal" data-delay="1">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
+          </div>
+          <h3 data-en="Scripts need no build">脚本不用编译</h3>
+          <p data-en="Drop a .js into the scripts folder, restart, and the module shows up in the GUI with its own property panel.">
+            写一个 .js 放进脚本目录，重启后模块直接出现在 GUI 里，属性面板也会自己生成。
+          </p>
+          <span class="card-line"></span>
+        </article>
+
+        <article class="card reveal" data-delay="2">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <h3 data-en="Music without leaving the game">游戏里直接放歌</h3>
+          <p data-en="Search, play and read lyrics from the Music category. Member-only tracks fall back to a source that still has the original.">
+            在 Music 栏里搜歌、播放、看歌词。会员曲走备用源，放的还是原唱。
+          </p>
+          <span class="card-line"></span>
+        </article>
+
+        <article class="card reveal" data-delay="3">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3 data-en="The GUI won't crash the game">界面不会把游戏搞崩</h3>
+          <p data-en="Anything that can return null is checked, and GL state is verified every frame. Leave it running overnight.">
+            会返回 null 的地方都判了空，GL 状态每帧核对。挂一晚上不用重开。
+          </p>
+          <span class="card-line"></span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 模块 ===== -->
+  <section class="section section-alt" id="modules">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow" data-en="Modules">模块</span>
+        <h2 data-en-html="The ones people <em>leave on</em>">挑几个<em>常开的</em>说</h2>
+        <p data-en="Six categories. One line each.">
+          六类，每个一行。
+        </p>
+      </div>
+
+      <div class="tabs reveal" role="tablist">
+        <span class="tab-pill" aria-hidden="true"></span>
+        <button class="tab active" data-tab="combat" role="tab"><span data-en="Combat">战斗</span></button>
+        <button class="tab" data-tab="movement" role="tab"><span data-en="Movement">移动</span></button>
+        <button class="tab" data-tab="render" role="tab"><span data-en="Render">渲染</span></button>
+        <button class="tab" data-tab="player" role="tab"><span data-en="Player">玩家</span></button>
+        <button class="tab" data-tab="misc" role="tab"><span data-en="Misc">杂项</span></button>
+        <button class="tab" data-tab="music" role="tab"><span data-en="Music">音乐</span></button>
+      </div>
+
+      <div class="panels reveal">
+        <div class="panel active" data-panel="combat">
+          <div class="mod-grid">
+            <div class="mod"><b>KillAura</b><span data-en="Six rotation modes incl. LiquidBounce &amp; Hypixel, CPS record replay, ten auto-block modes.">六档旋转（含 LiquidBounce / Hypixel）、CPS 记录回放、十档自动格挡。</span></div>
+            <div class="mod"><b>Velocity</b><span data-en="Knockback control, tuned per mode.">改击退力度，每个模式单独调。</span></div>
+            <div class="mod"><b>Reach</b><span data-en="Interaction distance, clamped to a ceiling.">调交互距离，超上限会被钳回去。</span></div>
+            <div class="mod"><b>BackTrack</b><span data-en="Rewinds target positions before you swing.">出刀前把目标位置往回倒一点。</span></div>
+            <div class="mod"><b>AutoClicker</b><span data-en="CPS range with randomised timing.">设定 CPS 区间，间隔随机取点。</span></div>
+            <div class="mod"><b>SmartAttack</b><span data-en="Skips swings that cannot land.">打不中的那一下不挥。</span></div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="movement">
+          <div class="mod-grid">
+            <div class="mod"><b>Fly</b><span data-en="Flight with speed control and vertical input.">飞行，速度可调，能上下。</span></div>
+            <div class="mod"><b>Speed</b><span data-en="Separate ground and air acceleration modes.">地面和空中两套加速。</span></div>
+            <div class="mod"><b>NoSlow</b><span data-en="No slowdown while eating or blocking.">吃东西、举剑时不减速。</span></div>
+            <div class="mod"><b>LongJump</b><span data-en="Charged jumps in preset distances.">蓄力跳远，几个距离档位。</span></div>
+            <div class="mod"><b>Blink</b><span data-en="Buffers your movement, then releases it at once.">把位移先存起来，再一次性放出。</span></div>
+            <div class="mod"><b>AntiVoid</b><span data-en="Pulls you back before the void kills you.">掉到虚空前把你拉回来。</span></div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="render">
+          <div class="mod-grid">
+            <div class="mod"><b>DynamicIsland</b><span data-en="Top HUD pill: FPS, block count, track name, lyrics.">顶部 HUD 胶囊，显示 FPS、方块数、歌名和歌词。</span></div>
+            <div class="mod"><b>ESP</b><span data-en="Boxes, outlines, health bars.">方框、描边、血条。</span></div>
+            <div class="mod"><b>HUD</b><span data-en="Every element draggable, positions saved to config.">每个元素都能拖，位置存进配置。</span></div>
+            <div class="mod"><b>Tracers</b><span data-en="Lines to targets, fading with distance.">指向目标的线，远了变淡。</span></div>
+            <div class="mod"><b>NameTags</b><span data-en="Names with health and worn gear.">名牌，带血量和身上的装备。</span></div>
+            <div class="mod"><b>TargetHUD</b><span data-en="Health, armour and distance of your current target.">正在打的人的血量、护甲和距离。</span></div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="player">
+          <div class="mod-grid">
+            <div class="mod"><b>Scaffold</b><span data-en="Tower and bridge, with rotation lock.">搭塔和搭桥，带旋转锁定。</span></div>
+            <div class="mod"><b>InvManager</b><span data-en="Sorts the inventory by your own rules.">按你定的规则整理背包。</span></div>
+            <div class="mod"><b>ChestStealer</b><span data-en="Loot filters and delay per chest.">开箱自动拿，可设过滤和延迟。</span></div>
+            <div class="mod"><b>AutoTool</b><span data-en="Swaps to the fastest tool per block.">挖方块时换最快的工具。</span></div>
+            <div class="mod"><b>FastPlace</b><span data-en="Removes the placement cooldown.">去掉放置冷却。</span></div>
+            <div class="mod"><b>GhostHand</b><span data-en="Right-click interact through a block.">隔着方块也能右键交互。</span></div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="misc">
+          <div class="mod-grid">
+            <div class="mod"><b>Spammer</b><span data-en="Timed chat, never sends the same line twice.">定时发消息，同一句不重复发。</span></div>
+            <div class="mod"><b>NickHider</b><span data-en="Replaces your name on screen and in chat.">把界面和聊天里自己的名字换掉。</span></div>
+            <div class="mod"><b>Disabler</b><span data-en="Reduces the chance of motion checks tripping.">少触发一点移动检测。</span></div>
+            <div class="mod"><b>NoRotate</b><span data-en="Ignores server-forced view rotations.">服务器强转你视角时不跟。</span></div>
+            <div class="mod"><b>AntiObbyTrap</b><span data-en="Finds a gap when you get boxed in obsidian.">被黑曜石围住时找缝钻出去。</span></div>
+            <div class="mod"><b>BedNuker</b><span data-en="Breaks beds through the defence layer.">隔着防御层拆床。</span></div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="music">
+          <div class="mod-grid">
+            <div class="mod"><b>MusicPlayer</b><span data-en="Volume, quality, loop mode.">音量、音质、循环模式。</span></div>
+            <div class="mod"><b data-en="Search in GUI">界面内搜索</b><span data-en="Click the row, type, press enter. Results refresh in place.">点那行、打字、回车，结果就地刷新。</span></div>
+            <div class="mod"><b data-en="Dual Source">双音源</b><span data-en="If one source fails, the other still plays the original artist.">网易云放不了就换酷我，还是原唱。</span></div>
+            <div class="mod"><b data-en="Synced Lyrics">逐字歌词</b><span data-en="Lyrics scroll inside the dynamic island.">歌词在灵动岛里逐字滚动。</span></div>
+            <div class="mod"><b data-en="Infinite Scroll">无限翻页</b><span data-en="Reach the bottom and the next page loads.">滚到底，下一页自己加载。</span></div>
+            <div class="mod"><b data-en="Controls">播放控制</b><span data-en="Previous, play/pause, next — one row.">上一首、播放/暂停、下一首。</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 数据 ===== -->
+  <section class="stats">
+    <div class="container stats-inner">
+      <div class="stat reveal"><b data-count="80" data-suffix="+">0</b><span data-en="Modules">功能模块</span></div>
+      <div class="stat reveal" data-delay="1"><b data-count="900" data-suffix="+">0</b><span data-en="Settings">可调选项</span></div>
+      <div class="stat reveal" data-delay="2"><b data-count="48">0</b><span data-en="Mixins">注入点</span></div>
+      <div class="stat reveal" data-delay="3"><b data-count="100" data-suffix="%">0</b><span data-en="Client-side">纯客户端</span></div>
+    </div>
+  </section>
+
+  <!-- ===== 下载 ===== -->
+  <section class="section" id="download">
+    <div class="container">
+      <div class="download-card reveal">
+        <div class="dl-glow" aria-hidden="true"></div>
+
+        <div class="dl-left">
+          <span class="eyebrow" data-en="Install">安装</span>
+          <h2 data-en-html="Download <em>Spire</em>">下载 <em>Spire</em></h2>
+          <p data-en="Drop it in the mods folder and launch Forge 1.8.9. There is nothing else to do.">
+            丢进 mods 文件夹，用 Forge 1.8.9 启动。没有别的步骤。
+          </p>
+
+          <div class="dl-specs">
+            <div><span data-en="Version">版本</span><b>v2.5 RF</b></div>
+            <div><span data-en="Minecraft">游戏版本</span><b>1.8.9</b></div>
+            <div><span data-en="Loader">加载器</span><b>Forge</b></div>
+            <div><span data-en="File">文件</span><b>Spire.jar</b></div>
+          </div>
+
+          <div class="dl-actions">
+            <a class="btn btn-primary btn-lg" href="downloads/Spire.jar" download>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16"/></svg>
+              <span data-en="Download Spire.jar">下载 Spire.jar</span>
+            </a>
+            <span class="dl-hint" data-en="No account needed">不需要账号</span>
+          </div>
+        </div>
+
+        <div class="dl-right">
+          <div class="path-card">
+            <div class="path-head">
+              <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg>
+              <span data-en="Where to put it">放在哪里</span>
+            </div>
+            <div class="path-body">
+              <code>.minecraft/<b>mods</b>/</code>
+              <div class="path-tree">
+                <div class="pt-row"><i class="pt-folder"></i><span>.minecraft</span></div>
+                <div class="pt-row lvl2"><i class="pt-folder"></i><span>mods</span></div>
+                <div class="pt-row lvl3 hl"><i class="pt-jar"></i><span>Spire.jar</span></div>
+              </div>
+            </div>
+            <div class="path-foot" data-en="Keep one Spire jar in mods. Two of them conflict on load.">
+              mods 里只留一个 Spire jar，两个会冲突。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="section section-alt" id="faq">
+    <div class="container narrow">
+      <div class="section-head reveal">
+        <span class="eyebrow" data-en="Questions">常见问题</span>
+        <h2 data-en-html="A few <em>common ones</em>">几个<em>常问的</em></h2>
+      </div>
+
+      <div class="faq reveal">
+        <details open>
+          <summary><span data-en="Which version do I need?">需要哪个游戏版本？</span><i></i></summary>
+          <div class="faq-body"><p data-en="Minecraft 1.8.9 with Forge. Nothing else works — the client is compiled against the 1.8.9 mappings.">
+            Minecraft 1.8.9 加 Forge。其他版本跑不起来，客户端是对着 1.8.9 的映射编译的。
+          </p></div>
+        </details>
+
+        <details>
+          <summary><span data-en="Where does the jar go?">jar 放哪？</span><i></i></summary>
+          <div class="faq-body"><p data-en="Into .minecraft/mods/, next to your other Forge mods. One Spire jar only.">
+            放进 .minecraft/mods/，和你其他 Forge 模组放一起。只放一个 Spire jar。
+          </p></div>
+        </details>
+
+        <details>
+          <summary><span data-en="How do I open the menu?">怎么打开菜单？</span><i></i></summary>
+          <div class="faq-body"><p data-en="Right Shift by default. Change it in Options → Controls, or inside the client's own settings.">
+            默认是右 Shift。可以在「选项 → 控制」里改，也可以在客户端自己的设置里改。
+          </p></div>
+        </details>
+
+        <details>
+          <summary><span data-en="Does it work on servers?">服务器上能用吗？</span><i></i></summary>
+          <div class="faq-body"><p data-en="It is a client-side mod. Nothing goes on the server.">
+            纯客户端模组，服务端不用装东西。
+          </p></div>
+        </details>
+
+        <details>
+          <summary><span data-en="Settings gone after updating?">更新后设置没了？</span><i></i></summary>
+          <div class="faq-body"><p data-en="Configs live in .minecraft/Spire/. Back that folder up before switching versions — key names occasionally change between builds.">
+            配置在 .minecraft/Spire/。换版本前把这个文件夹备份一下，键名偶尔会变。
+          </p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark small">
+        <img src="assets/logo.png" alt="Spire" width="18" height="18">
+      </span>
+      <span>SPIRE</span>
+    </div>
+    <p class="footer-note" data-en="A client-side mod for Minecraft 1.8.9. Not affiliated with Mojang or Microsoft.">
+      Minecraft 1.8.9 的客户端模组。与 Mojang 和 Microsoft 无关。
+    </p>
+    <div class="footer-links">
+      <a href="#features" data-en="Features">特性</a>
+      <a href="#modules" data-en="Modules">模块</a>
+      <a href="#download" data-en="Download">下载</a>
+      <a href="#faq" data-en="FAQ">常见问题</a>
+    </div>
+    <div class="footer-copy">© 2026 Spire. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
